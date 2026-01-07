@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.30;
 
-import {Script} from "forge-std/Script.sol";
+import {Script, console} from "forge-std/Script.sol";
 import {BoxV2} from "../src/BoxV2.sol";
-import {DevOpsTools, console} from "lib/foundry-devops/src/DevOpsTools.sol";
+import {DevOpsTools} from "lib/foundry-devops/src/DevOpsTools.sol";
 import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
 contract UpgradeBox is Script {
@@ -13,16 +13,22 @@ contract UpgradeBox is Script {
 
         console.log("Upgrading Box at proxy address:", proxy);
 
+        address implementationAddress = upgradeBox(proxy);
+
+        console.log("Implementation Address:", implementationAddress);
+
+        return implementationAddress;
+    }
+
+    function upgradeBox(address proxy) public returns (address) {
         vm.startBroadcast();
 
-        Upgrades.upgradeProxy(proxy, "BoxV2.sol", "");
+        Upgrades.upgradeProxy(proxy, "BoxV2.sol", abi.encodeCall(BoxV2.initialize, ()));
 
         // Get the implementation address
         address implementationAddress = Upgrades.getImplementationAddress(proxy);
 
         vm.stopBroadcast();
-
-        console.log("Implementation Address:", implementationAddress);
 
         return implementationAddress;
     }

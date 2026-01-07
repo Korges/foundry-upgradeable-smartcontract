@@ -10,7 +10,7 @@ contract DeployBox is Script {
         vm.startBroadcast();
 
         // deploy proxy + initialize atomically
-        address proxy = Upgrades.deployUUPSProxy("BoxV1.sol", abi.encodeCall(BoxV1.initialize, (msg.sender)));
+        address proxy = Upgrades.deployUUPSProxy("BoxV1.sol", abi.encodeCall(BoxV1.initialize, ()));
 
         // Get the implementation address
         address implementationAddress = Upgrades.getImplementationAddress(proxy);
